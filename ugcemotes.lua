@@ -160,7 +160,6 @@ local function tw(obj, t, props)
     TS:Create(obj, TweenInfo.new(t, Enum.EasingStyle.Quint), props):Play()
 end
 
---im gay as shit i forgot to do this lol..
 local notify = _G.BleedNotify or (function()
     local notifStack = {}
     local W_N  = 320
@@ -548,11 +547,6 @@ local TabAnim  = btn(TabBar, {bg = C.BG0, bgt = 1, text = "Animations", font = E
 
 local FavBtn    = btn(Toolbar, {bg = C.BG2, text = "Favourites", font = Enum.Font.GothamBold, size = 11, color = C.Dim,
     sz = UDim2.new(0, 88, 0, 28), pos = UDim2.new(0, 168, 0.5, -14), r = 6, z = 102})
-    sz = UDim2.new(0, 70, 0, 28), pos = UDim2.new(0, 264, 0.5, -14), r = 6, z = 102})
-    sz = UDim2.new(0, 60, 0, 28), pos = UDim2.new(0, 342, 0.5, -14), r = 6, z = 102})
-
-
-    sz = UDim2.new(0, 50, 0, 28), pos = UDim2.new(1, -50, 0.5, -14), r = 6, z = 102})
 
 local SearchFrame  = frame(Main, {bg = C.BG2, sz = UDim2.new(1, -32, 0, 30), pos = UDim2.new(0, 16, 0, 100), z = 101})
 corner(SearchFrame, 8)
