@@ -1,3 +1,4 @@
+--credits to 7yd7
 local Players   = game:GetService("Players")
 local RS        = game:GetService("RunService")
 local UIS       = game:GetService("UserInputService")
@@ -159,165 +160,169 @@ local function tw(obj, t, props)
     TS:Create(obj, TweenInfo.new(t, Enum.EasingStyle.Quint), props):Play()
 end
 
-local notifStack = {}
-local W_N  = 320
-local X_SH = -(320 + 16)
-local X_HI = 10
-local GAP  = 8
+--im gay as shit i forgot to do this lol..
+local notify = _G.BleedNotify or (function()
+    local notifStack = {}
+    local W_N  = 320
+    local X_SH = -(320 + 16)
+    local X_HI = 10
+    local GAP  = 8
 
-local function reposition()
-    local yOff = -12
-    for i, entry in ipairs(notifStack) do
-        yOff = yOff - entry.frame.AbsoluteSize.Y - GAP
-        TS:Create(entry.frame, TweenInfo.new(0.45, Enum.EasingStyle.Quint), {
-            Position = UDim2.new(1, X_SH, 1, yOff)
-        }):Play()
+    local function reposition()
+        local yOff = -12
+        for i, entry in ipairs(notifStack) do
+            yOff = yOff - entry.frame.AbsoluteSize.Y - GAP
+            TS:Create(entry.frame, TweenInfo.new(0.45, Enum.EasingStyle.Quint), {
+                Position = UDim2.new(1, X_SH, 1, yOff)
+            }):Play()
+        end
     end
-end
 
-local function notify(title, msg, icon)
-    task.spawn(function()
-        local descLines = math.max(1, math.min(math.ceil(#(msg or "") / 38), 4))
-        local H = 54 + (descLines - 1) * 14
-
-        local nf = Instance.new("Frame", SG)
-        nf.Size                   = UDim2.new(0, W_N, 0, H)
-        nf.Position               = UDim2.new(1, X_HI, 1, -H - 12)
-        nf.BackgroundColor3       = C.BG0
-        nf.BackgroundTransparency = 1
-        nf.BorderSizePixel        = 0
-        nf.ZIndex                 = 200
-        nf.ClipsDescendants       = true
-        Instance.new("UICorner", nf).CornerRadius = UDim.new(0, 10)
-
-        local nGrad = Instance.new("UIGradient", nf)
-        nGrad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 5, 5)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(6,  3, 3)),
-        })
-        nGrad.Rotation = 135
-
-        local nStroke = Instance.new("UIStroke", nf)
-        nStroke.Color       = C.Stk
-        nStroke.Thickness   = 1
-        nStroke.Transparency = 1
-
-        local bar = Instance.new("Frame", nf)
-        bar.Size                   = UDim2.new(0, 3, 0.7, 0)
-        bar.Position               = UDim2.new(0, 0, 0.15, 0)
-        bar.BackgroundColor3       = C.Accent
-        bar.BackgroundTransparency = 1
-        bar.BorderSizePixel        = 0
-        Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 2)
-
-        local iconImg = Instance.new("ImageLabel", nf)
-        iconImg.Size                   = UDim2.new(0, 28, 0, 28)
-        iconImg.Position               = UDim2.new(0, 14, 0.5, -14)
-        iconImg.BackgroundTransparency = 1
-        iconImg.ImageTransparency      = 1
-        iconImg.ZIndex                 = 201
-        iconImg.ScaleType              = Enum.ScaleType.Fit
-
-        if type(icon) == "number" then
-            iconImg.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. icon .. "&width=150&height=150&format=png"
-            Instance.new("UICorner", iconImg).CornerRadius = UDim.new(1, 0)
-        elseif type(icon) == "string" and icon ~= "" then
-            iconImg.Image = icon
-        else
-            iconImg.Image = "rbxassetid://14385986465"
-        end
-
-        local titleL = Instance.new("TextLabel", nf)
-        titleL.Text                  = title or ""
-        titleL.Font                  = Enum.Font.GothamBold
-        titleL.TextSize              = 13
-        titleL.TextColor3            = C.W
-        titleL.Position              = UDim2.new(0, 50, 0, 10)
-        titleL.Size                  = UDim2.new(1, -60, 0, 16)
-        titleL.BackgroundTransparency = 1
-        titleL.TextXAlignment        = Enum.TextXAlignment.Left
-        titleL.TextTransparency      = 1
-        titleL.TextTruncate          = Enum.TextTruncate.AtEnd
-        titleL.ZIndex                = 201
-
-        local timeL = Instance.new("TextLabel", nf)
-        timeL.Text                  = "now"
-        timeL.Font                  = Enum.Font.Gotham
-        timeL.TextSize              = 9
-        timeL.TextColor3            = C.Dim
-        timeL.Position              = UDim2.new(1, -38, 0, 12)
-        timeL.Size                  = UDim2.new(0, 32, 0, 14)
-        timeL.BackgroundTransparency = 1
-        timeL.TextXAlignment        = Enum.TextXAlignment.Right
-        timeL.TextTransparency      = 1
-        timeL.ZIndex                = 201
-
-        local msgL = Instance.new("TextLabel", nf)
-        msgL.Text                  = msg or ""
-        msgL.Font                  = Enum.Font.Gotham
-        msgL.TextSize              = 11
-        msgL.TextColor3            = C.Dim
-        msgL.Position              = UDim2.new(0, 50, 0, 29)
-        msgL.Size                  = UDim2.new(1, -60, 1, -34)
-        msgL.BackgroundTransparency = 1
-        msgL.TextXAlignment        = Enum.TextXAlignment.Left
-        msgL.TextWrapped           = true
-        msgL.TextTransparency      = 1
-        msgL.ZIndex                = 201
-
-        local interact = Instance.new("TextButton", nf)
-        interact.Size                   = UDim2.new(1, 0, 1, 0)
-        interact.BackgroundTransparency = 1
-        interact.Text                   = ""
-        interact.ZIndex                 = 202
-
-        local entry = {frame = nf}
-        table.insert(notifStack, 1, entry)
-        reposition()
-
+    return function(title, msg, icon)
         task.spawn(function()
-            local snd = Instance.new("Sound")
-            snd.SoundId = "rbxassetid://255881176"
-            snd.Volume  = 0.65
-            snd.Parent  = SG
-            snd:Play()
-            game:GetService("Debris"):AddItem(snd, 2)
-        end)
+            local descLines = math.max(1, math.min(math.ceil(#(msg or "") / 38), 4))
+            local H = 54 + (descLines - 1) * 14
 
-        TS:Create(nf,      TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.35}):Play()
-        TS:Create(nStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0.6}):Play()
-        TS:Create(bar,     TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-        task.wait(0.05)
-        TS:Create(iconImg, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
-        task.wait(0.04)
-        TS:Create(titleL,  TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-        task.wait(0.04)
-        TS:Create(msgL,    TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.15}):Play()
-        TS:Create(timeL,   TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.5}):Play()
+            local nf = Instance.new("Frame", SG)
+            nf.Size                   = UDim2.new(0, W_N, 0, H)
+            nf.Position               = UDim2.new(1, X_HI, 1, -H - 12)
+            nf.BackgroundColor3       = C.BG0
+            nf.BackgroundTransparency = 1
+            nf.BorderSizePixel        = 0
+            nf.ZIndex                 = 200
+            nf.ClipsDescendants       = true
+            Instance.new("UICorner", nf).CornerRadius = UDim.new(0, 10)
 
-        local dismissed = false
-        local function dismiss()
-            if dismissed then return end
-            dismissed = true
-            local idx = table.find(notifStack, entry)
-            if idx then table.remove(notifStack, idx) end
-            TS:Create(nf, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
-                {Position = UDim2.new(1, X_HI, nf.Position.Y.Scale, nf.Position.Y.Offset)}):Play()
-            TS:Create(nf,      TweenInfo.new(0.35), {BackgroundTransparency = 1}):Play()
-            TS:Create(nStroke, TweenInfo.new(0.25), {Transparency = 1}):Play()
-            TS:Create(titleL,  TweenInfo.new(0.2),  {TextTransparency = 1}):Play()
-            TS:Create(msgL,    TweenInfo.new(0.2),  {TextTransparency = 1}):Play()
-            TS:Create(bar,     TweenInfo.new(0.2),  {BackgroundTransparency = 1}):Play()
-            TS:Create(iconImg, TweenInfo.new(0.2),  {ImageTransparency = 1}):Play()
-            task.wait(0.65)
-            nf:Destroy()
+            local nGrad = Instance.new("UIGradient", nf)
+            nGrad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 5, 5)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(6,  3, 3)),
+            })
+            nGrad.Rotation = 135
+
+            local nStroke = Instance.new("UIStroke", nf)
+            nStroke.Color        = C.Stk
+            nStroke.Thickness    = 1
+            nStroke.Transparency = 1
+
+            local bar = Instance.new("Frame", nf)
+            bar.Size                   = UDim2.new(0, 3, 0.7, 0)
+            bar.Position               = UDim2.new(0, 0, 0.15, 0)
+            bar.BackgroundColor3       = C.Accent
+            bar.BackgroundTransparency = 1
+            bar.BorderSizePixel        = 0
+            Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 2)
+
+            local iconImg = Instance.new("ImageLabel", nf)
+            iconImg.Size                   = UDim2.new(0, 28, 0, 28)
+            iconImg.Position               = UDim2.new(0, 14, 0.5, -14)
+            iconImg.BackgroundTransparency = 1
+            iconImg.ImageTransparency      = 1
+            iconImg.ZIndex                 = 201
+            iconImg.ScaleType              = Enum.ScaleType.Fit
+
+            if type(icon) == "number" then
+                iconImg.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. icon .. "&width=150&height=150&format=png"
+                Instance.new("UICorner", iconImg).CornerRadius = UDim.new(1, 0)
+            elseif type(icon) == "string" and icon ~= "" then
+                iconImg.Image = icon
+            else
+                iconImg.Image = "rbxassetid://14385986465"
+            end
+
+            local titleL = Instance.new("TextLabel", nf)
+            titleL.Text                   = title or ""
+            titleL.Font                   = Enum.Font.GothamBold
+            titleL.TextSize               = 13
+            titleL.TextColor3             = C.W
+            titleL.Position               = UDim2.new(0, 50, 0, 10)
+            titleL.Size                   = UDim2.new(1, -60, 0, 16)
+            titleL.BackgroundTransparency = 1
+            titleL.TextXAlignment         = Enum.TextXAlignment.Left
+            titleL.TextTransparency       = 1
+            titleL.TextTruncate           = Enum.TextTruncate.AtEnd
+            titleL.ZIndex                 = 201
+
+            local timeL = Instance.new("TextLabel", nf)
+            timeL.Text                   = "now"
+            timeL.Font                   = Enum.Font.Gotham
+            timeL.TextSize               = 9
+            timeL.TextColor3             = C.Dim
+            timeL.Position               = UDim2.new(1, -38, 0, 12)
+            timeL.Size                   = UDim2.new(0, 32, 0, 14)
+            timeL.BackgroundTransparency = 1
+            timeL.TextXAlignment         = Enum.TextXAlignment.Right
+            timeL.TextTransparency       = 1
+            timeL.ZIndex                 = 201
+
+            local msgL = Instance.new("TextLabel", nf)
+            msgL.Text                   = msg or ""
+            msgL.Font                   = Enum.Font.Gotham
+            msgL.TextSize               = 11
+            msgL.TextColor3             = C.Dim
+            msgL.Position               = UDim2.new(0, 50, 0, 29)
+            msgL.Size                   = UDim2.new(1, -60, 1, -34)
+            msgL.BackgroundTransparency = 1
+            msgL.TextXAlignment         = Enum.TextXAlignment.Left
+            msgL.TextWrapped            = true
+            msgL.TextTransparency       = 1
+            msgL.ZIndex                 = 201
+
+            local interact = Instance.new("TextButton", nf)
+            interact.Size                   = UDim2.new(1, 0, 1, 0)
+            interact.BackgroundTransparency = 1
+            interact.Text                   = ""
+            interact.ZIndex                 = 202
+
+            local entry = {frame = nf}
+            table.insert(notifStack, 1, entry)
             reposition()
-        end
 
-        interact.MouseButton1Click:Connect(dismiss)
-        task.delay(math.clamp(#(msg or "") * 0.1 + 2, 2.5, 10), dismiss)
-    end)
-end
+            task.spawn(function()
+                local snd = Instance.new("Sound")
+                snd.SoundId = "rbxassetid://255881176"
+                snd.Volume  = 0.65
+                snd.Parent  = SG
+                snd:Play()
+                game:GetService("Debris"):AddItem(snd, 2)
+            end)
+
+            TS:Create(nf,      TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.35}):Play()
+            TS:Create(nStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0.6}):Play()
+            TS:Create(bar,     TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+            task.wait(0.05)
+            TS:Create(iconImg, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+            task.wait(0.04)
+            TS:Create(titleL,  TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+            task.wait(0.04)
+            TS:Create(msgL,    TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.15}):Play()
+            TS:Create(timeL,   TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.5}):Play()
+
+            local dismissed = false
+            local function dismiss()
+                if dismissed then return end
+                dismissed = true
+                local idx = table.find(notifStack, entry)
+                if idx then table.remove(notifStack, idx) end
+                TS:Create(nf, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+                    {Position = UDim2.new(1, X_HI, nf.Position.Y.Scale, nf.Position.Y.Offset)}):Play()
+                TS:Create(nf,      TweenInfo.new(0.35), {BackgroundTransparency = 1}):Play()
+                TS:Create(nStroke, TweenInfo.new(0.25), {Transparency = 1}):Play()
+                TS:Create(titleL,  TweenInfo.new(0.2),  {TextTransparency = 1}):Play()
+                TS:Create(msgL,    TweenInfo.new(0.2),  {TextTransparency = 1}):Play()
+                TS:Create(bar,     TweenInfo.new(0.2),  {BackgroundTransparency = 1}):Play()
+                TS:Create(iconImg, TweenInfo.new(0.2),  {ImageTransparency = 1}):Play()
+                task.wait(0.65)
+                nf:Destroy()
+                reposition()
+            end
+
+            interact.MouseButton1Click:Connect(dismiss)
+            task.delay(math.clamp(#(msg or "") * 0.1 + 2, 2.5, 10), dismiss)
+        end)
+    end
+end)()
+
 
 local function fetchEmotes()
     local ok, res = pcall(function() return game:HttpGet(EMOTE_URL) end)
@@ -543,6 +548,11 @@ local TabAnim  = btn(TabBar, {bg = C.BG0, bgt = 1, text = "Animations", font = E
 
 local FavBtn    = btn(Toolbar, {bg = C.BG2, text = "Favourites", font = Enum.Font.GothamBold, size = 11, color = C.Dim,
     sz = UDim2.new(0, 88, 0, 28), pos = UDim2.new(0, 168, 0.5, -14), r = 6, z = 102})
+    sz = UDim2.new(0, 70, 0, 28), pos = UDim2.new(0, 264, 0.5, -14), r = 6, z = 102})
+    sz = UDim2.new(0, 60, 0, 28), pos = UDim2.new(0, 342, 0.5, -14), r = 6, z = 102})
+
+
+    sz = UDim2.new(0, 50, 0, 28), pos = UDim2.new(1, -50, 0.5, -14), r = 6, z = 102})
 
 local SearchFrame  = frame(Main, {bg = C.BG2, sz = UDim2.new(1, -32, 0, 30), pos = UDim2.new(0, 16, 0, 100), z = 101})
 corner(SearchFrame, 8)
